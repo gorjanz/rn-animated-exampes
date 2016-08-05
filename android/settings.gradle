@@ -1,0 +1,3 @@
+rootProject.name = 'AnimatedPlayground'
+
+include ':app'
