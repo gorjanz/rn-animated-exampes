@@ -1,2 +1,2 @@
-# rn-animated-exampes
+# rn-animated-examples
 Playground repo for examples using React Native Animated API.
