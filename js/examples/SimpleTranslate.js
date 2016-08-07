@@ -14,57 +14,26 @@ import {
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
-class SimpleSquareInterpolation extends Component {
+class SimpleTranslate extends Component {
   constructor(props, context) {
     super(props, context);
 
     this.animatedValue = new Animated.Value(-1);
 
-    this._animateForward = this._animateForward.bind(this);
-    this._animateBack = this._animateBack.bind(this);
+    this._animate = this._animate.bind(this);
   }
 
   animatedValue: undefined
 
-  _onScrollHandler() {
-
-  }
-
-  _animateForward() {
-    //this.setState({ animatedValue: this.state.animatedValue.setValue(0) });
-
-    this.animatedValue.setValue(-1);
-    Animated.timing(
-      this.animatedValue,
-      {
-        toValue: 0,
-        duration: 500,
-        easing: Easing.linear
-      }
-    ).start();
-  }
-
-  _animateBack() {
-    this.animatedValue.setValue(0);
-
-    /*
-     Animated.timing(
-     this.state.animatedValue,
-     {
-     toValue: 1,
-     duration: 1500,
-     easing: Easing.linear
-     }
-     ).start();
-     */
+  _animate(startValue, endValue) {
+    this.animatedValue.setValue(startValue);
 
     Animated.spring(
       this.animatedValue,
       {
-        toValue: 1,
-        velocity: 0.5,  // Velocity makes it move
-        // tension: 100, // Slow
-        // friction: 7,
+        toValue: endValue,
+        velocity: 1,
+        friction: 9
       }
     ).start();
   }
@@ -72,6 +41,21 @@ class SimpleSquareInterpolation extends Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Animated.View
+          style={[
+            styles.bigSquare,
+            {
+              transform: [
+                {
+                  translateX: this.animatedValue.interpolate({
+                    inputRange: [-1, 0, 1],
+                    outputRange: [0, SCREEN_WIDTH, 0]})
+                }
+              ]
+            }
+          ]}
+        />
+
         <Animated.Text
           style={[
             styles.text,
@@ -84,21 +68,11 @@ class SimpleSquareInterpolation extends Component {
         >
           {'Example Text'}
         </Animated.Text>
-        <Animated.View
-          style={[
-            styles.bigSquare,
-            {
-              height: this.animatedValue.interpolate({
-                inputRange: [-1, 0, 1],
-                outputRange: [50, SCREEN_HEIGHT / 2, 50]}),
-            }
-          ]}
-        />
 
-        <TouchableHighlight onPress={this._animateForward} underlayColor={'white'}>
+        <TouchableHighlight style={styles.button} onPress={() => this._animate(-1, 0)} underlayColor={'blue'}>
           <Text>{' Touch to animate forward '}</Text>
         </TouchableHighlight>
-        <TouchableHighlight onPress={this._animateBack} underlayColor={'white'}>
+        <TouchableHighlight style={styles.button} onPress={() => this._animate(0, 1)} underlayColor={'blue'}>
           <Text>{' Touch to animate back '}</Text>
         </TouchableHighlight>
       </ScrollView>
@@ -121,18 +95,19 @@ const styles = StyleSheet.create({
   bigSquare: {
     position: 'absolute',
 
-    bottom: 0,
+    top: 0,
     left: 0,
 
     width: SCREEN_WIDTH,
-    height: 50,
+    height: SCREEN_HEIGHT,
 
     backgroundColor: 'blue'
   },
   button: {
-    marginTop: 50,
+    margin: 10,
     backgroundColor: 'red'
   }
 });
 
-export default SimpleSquareInterpolation;
+export default SimpleTranslate;
+

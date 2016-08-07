@@ -6,22 +6,25 @@ import {
   Animated,
   StyleSheet,
   Text,
-  ScrollView,
+  View,
   TouchableHighlight,
   Easing,
-  Dimensions
+  Dimensions,
+  PanResponder
 } from 'react-native';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
-class SimpleNavCardLeft2Right extends Component {
+class BasicPanResponder extends Component {
   constructor(props, context) {
     super(props, context);
 
     this.animatedValue = new Animated.Value(-1);
+
     this._animate = this._animate.bind(this);
   }
 
+  _panResponder: undefined
   animatedValue: undefined
 
   _animate(startValue, endValue) {
@@ -31,44 +34,61 @@ class SimpleNavCardLeft2Right extends Component {
       this.animatedValue,
       {
         toValue: endValue,
-        velocity: 1
+        velocity: 1,
+        friction: 10
       }
     ).start();
   }
 
+  componentWillMount() {
+    this._panResponder = PanResponder.create({
+      onMoveShouldSetPanResponder: (evt, {dx, dy, moveX, moveY, x0, y0}) => {
+        return true;
+      },
+
+      onPanResponderMove: (evt, {dx, dy, moveX, moveY, x0, y0}) => {
+        this.animatedValue.setValue(dx);
+
+      }
+    });
+  }
+
   render() {
     return (
-      <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.container} {...this._panResponder.panHandlers}>
+        <Animated.View
+          style={[
+            styles.bigSquare,
+            {
+              transform: [{
+                translateX: this.animatedValue.interpolate({
+                inputRange: [0, SCREEN_WIDTH, 2 * SCREEN_WIDTH],
+                outputRange: [0, SCREEN_WIDTH - 50, 0]})
+              }]
+            }
+          ]}
+        />
+
+        <TouchableHighlight onPress={() => this._animate(0, SCREEN_WIDTH)} underlayColor={'white'}>
+          <Text>{' Touch to animate forward '}</Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={() => this._animate(SCREEN_WIDTH -50, 0)} underlayColor={'white'}>
+          <Text>{' Touch to animate back '}</Text>
+        </TouchableHighlight>
+
         <Animated.Text
           style={[
             styles.text,
             {
               fontSize: this.animatedValue.interpolate({
-                inputRange: [-1, 0, 1],
-                outputRange: [40, 20, 40]}),
+                inputRange: [0, SCREEN_WIDTH, 2 * SCREEN_WIDTH],
+                outputRange: [15, 20, 15]}),
             }
           ]}
         >
-          {'Example Text'}
+          {'AAAAAA'}
         </Animated.Text>
-        <Animated.View
-          style={[
-            styles.bigSquare,
-            {
-              left: this.animatedValue.interpolate({
-                inputRange: [-1, 0, 1],
-                outputRange: [0, SCREEN_WIDTH, 0]}),
-            }
-          ]}
-        />
-
-        <TouchableHighlight onPress={() => this._animate(-1, 0)} underlayColor={'white'}>
-          <Text>{' Touch to animate forward '}</Text>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={() => this._animate(0, 1)} underlayColor={'white'}>
-          <Text>{' Touch to animate back '}</Text>
-        </TouchableHighlight>
-      </ScrollView>
+      </View>
     );
   }
 }
@@ -88,7 +108,7 @@ const styles = StyleSheet.create({
   bigSquare: {
     position: 'absolute',
 
-    bottom: 0,
+    top: 0,
     left: 0,
 
     width: SCREEN_WIDTH,
@@ -102,4 +122,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default SimpleNavCardLeft2Right;
+export default BasicPanResponder;
