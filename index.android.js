@@ -8,5 +8,6 @@ import SimpleSquareInterpolation from './js/examples/SimpleSquareInterpolation';
 import SimpleNavCardLeft2Right from './js/examples/SimpleNavCardLeft2Right';
 import SimpleTranslate from './js/examples/SimpleTranslate';
 import BasicPanResponder from './js/examples/BasicPanResponder';
+import OverlappingCards from './js/examples/OverlappingCards';
 
-AppRegistry.registerComponent('AnimatedPlayground', () => BasicPanResponder);
+AppRegistry.registerComponent('AnimatedPlayground', () => OverlappingCards);
